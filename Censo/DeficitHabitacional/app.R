@@ -9,6 +9,7 @@ library(mapsPERU)
 library(sf)
 library(scales)
 library(plotly)
+library(classInt)
 
 # 1. Importing the data ----
 ## First we set the working directory
@@ -117,44 +118,62 @@ server <- function(input, output) {
         
         if (input$Indicador == "Déficit Habitacional"){
           
-          map_shiny <- merge(x = map_peru, y = deficit_habitacional_departamento, by = "ubigeo", all.x = TRUE)
+          map_shiny <- merge(x = map_peru, y = deficit_habitacional_departamento, by = "ubigeo", all.x = TRUE)  %>% 
+            mutate(deficit_habitacional = as.numeric(deficit_habitacional))
+            
+          breaks <- classIntervals(map_shiny$deficit_habitacional, n = 3, style = "jenks")
+          map_shiny$jenks_breaks <- cut(map_shiny$deficit_habitacional, breaks$brks, include.lowest = TRUE)
+          
           
           mapa <- map_shiny %>% 
             ggplot() +
             aes(geometry = geometry) +
-            geom_sf(aes(fill = deficit_habitacional), linetype = 1,
+            geom_sf(aes(fill = jenks_breaks), linetype = 1,
                     lwd = 0.25) +
             theme_minimal()+
             theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank()) +
-            scale_fill_gradientn(colors = custom_palette, name = "% de hogares") 
+            scale_fill_manual(values = custom_palette, name = "Porcentaje de hogares (%)")
           ggplotly(mapa)
           
         } else if (input$Indicador == "Déficit Cualitativo"){
           
-          map_shiny <- merge(x = map_peru, y = deficit_cualitativo_departamento, by = "ubigeo", all.x = TRUE)
+          map_shiny <- merge(x = map_peru, y = deficit_cualitativo_departamento, by = "ubigeo", all.x = TRUE)%>% 
+            mutate(deficit_cuali = as.numeric(deficit_cuali_departamento))
+          
+          breaks <- classIntervals(map_shiny$deficit_cuali, n = 3, style = "jenks")
+          map_shiny$jenks_breaks <- cut(map_shiny$deficit_cuali, breaks$brks, include.lowest = TRUE)
+          
           
           mapa <- map_shiny %>% 
             ggplot() +
             aes(geometry = geometry) +
-            geom_sf(aes(fill = deficit_cuali_departamento), linetype = 1,
+            geom_sf(aes(fill = jenks_breaks), linetype = 1,
                     lwd = 0.25) +
-            theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank())+
-            scale_fill_gradientn(colors = custom_palette, name = "% de hogares")
+            theme_minimal()+
+            theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank()) +
+            scale_fill_manual(values = custom_palette, name = "Porcentaje de hogares (%)")
           ggplotly(mapa)
+          
           
         } else {
           
-          map_shiny <- merge(x = map_peru, y = deficit_cuantitativo_departamento, by = "ubigeo", all.x = TRUE)
+          map_shiny <- merge(x = map_peru, y = deficit_cuantitativo_departamento, by = "ubigeo", all.x = TRUE)%>% 
+            mutate(deficit_cuanti = as.numeric(deficit_cuanti_departamento))
+          
+          breaks <- classIntervals(map_shiny$deficit_cuanti, n = 3, style = "jenks")
+          map_shiny$jenks_breaks <- cut(map_shiny$deficit_cuanti, breaks$brks, include.lowest = TRUE)
+          
           
           mapa <- map_shiny %>% 
             ggplot() +
             aes(geometry = geometry) +
-            geom_sf(aes(fill = deficit_cuanti_departamento), linetype = 1,
+            geom_sf(aes(fill = jenks_breaks), linetype = 1,
                     lwd = 0.25) +
-            theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank())+
-            scale_fill_gradientn(colors = custom_palette, name = "% de hogares")
-          
+            theme_minimal()+
+            theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank()) +
+            scale_fill_manual(values = custom_palette, name = "Porcentaje de hogares (%)")
           ggplotly(mapa)
+          
         }
         
       
@@ -167,19 +186,21 @@ server <- function(input, output) {
         
         if (input$Indicador == "Déficit Habitacional"){
           
-          map_shiny <- merge(x = map_peru, y = deficit_habitacional_distrital, by = "ubigeo", all.x = TRUE)
+          map_shiny <- merge(x = map_peru, y = deficit_habitacional_distrital, by = "ubigeo", all.x = TRUE)%>% 
+            mutate(deficit_habitacional = as.numeric(deficit_habitacional))
+          
+          breaks <- classIntervals(map_shiny$deficit_habitacional, n = 3, style = "jenks")
+          map_shiny$jenks_breaks <- cut(map_shiny$deficit_habitacional, breaks$brks, include.lowest = TRUE)
           
           mapa <- map_shiny %>% 
             ggplot() +
             aes(geometry = geometry) +
-            geom_sf(color = "white", aes(fill = deficit_habitacional), linewidth = 0) +
+            geom_sf(color = "black", aes(fill = jenks_breaks), linewidth = 0) +
             theme_minimal() +
-            theme(
-              axis.text.x = element_blank(),
-              axis.text.y = element_blank(),
-              axis.ticks = element_blank()
-            ) +
-            scale_fill_gradientn(colors = custom_palette, name = "% de hogares")
+            theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank()) +
+            scale_fill_manual(values = custom_palette, name = "Porcentaje de hogares (%)") +
+            geom_sf(data = provinces, fill = NA, color = "black", lwd = 0.5) +
+            geom_sf(data = departments, fill = NA, color = "black", lwd = 1)
           
           ggplotly(mapa)
           
@@ -189,17 +210,18 @@ server <- function(input, output) {
           map_shiny <- merge(x = map_peru, y = deficit_cualitativo_distrital, by = "ubigeo", all.x = TRUE) %>% 
             mutate(deficit_cualitativo = as.numeric(deficit_cualitativo))
           
+          breaks <- classIntervals(map_shiny$deficit_cualitativo, n = 3, style = "jenks")
+          map_shiny$jenks_breaks <- cut(map_shiny$deficit_cualitativo, breaks$brks, include.lowest = TRUE)
+          
           mapa <- map_shiny %>% 
             ggplot() +
             aes(geometry = geometry) +
-            geom_sf(color = "white", aes(fill = deficit_cualitativo), linewidth = 0) +
+            geom_sf(color = "black", aes(fill = jenks_breaks), linewidth = 0) +
             theme_minimal() +
-            theme(
-              axis.text.x = element_blank(),
-              axis.text.y = element_blank(),
-              axis.ticks = element_blank()
-            ) +
-            scale_fill_gradientn(colors = custom_palette, name = "% de hogares")
+            theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank()) +
+            scale_fill_manual(values = custom_palette, name = "Porcentaje de hogares (%)") +
+            geom_sf(data = provinces, fill = NA, color = "black", lwd = 0.5) +
+            geom_sf(data = departments, fill = NA, color = "black", lwd = 1)
           
           ggplotly(mapa)
           
@@ -208,17 +230,18 @@ server <- function(input, output) {
           map_shiny <- merge(x = map_peru, y = deficit_cuantitativo_distrital, by = "ubigeo", all.x = TRUE) %>% 
             mutate(deficit_cuantitativo = as.numeric(deficit_cuantitativo))
 
+          breaks <- classIntervals(map_shiny$deficit_cuantitativo, n = 3, style = "jenks")
+          map_shiny$jenks_breaks <- cut(map_shiny$deficit_cuantitativo, breaks$brks, include.lowest = TRUE)
+          
           mapa <- map_shiny %>% 
             ggplot() +
             aes(geometry = geometry) +
-            geom_sf(color = "white", aes(fill = deficit_cuantitativo), linewidth = 0) +
+            geom_sf(color = "black", aes(fill = jenks_breaks), linewidth = 0) +
             theme_minimal() +
-            theme(
-              axis.text.x = element_blank(),
-              axis.text.y = element_blank(),
-              axis.ticks = element_blank()
-            ) +
-            scale_fill_gradientn(colors = custom_palette, name = "% de hogares")
+            theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank()) +
+            scale_fill_manual(values = custom_palette, name = "Porcentaje de hogares (%)") +
+            geom_sf(data = provinces, fill = NA, color = "black", lwd = 0.5) +
+            geom_sf(data = departments, fill = NA, color = "black", lwd = 1)
           
           ggplotly(mapa)
           
