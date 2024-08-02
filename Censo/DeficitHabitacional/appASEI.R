@@ -13,24 +13,19 @@ library(classInt)
 
 # 1. Importing the data ----
 ## First we set the working directory
-setwd("C:/Users/User/OneDrive - MIGRACIÓN VIDENZA/1. Proyectos/1. Proyectos actuales/25. ASEI - Propuestas Vivienda/0. Insumos/CENSO/Mapas/Insumos")
+setwd("C:/Users/User/OneDrive - VIDENZA/1. Proyectos Videnza/1. Proyectos actuales/25. ASEI - Propuestas Vivienda/0. Insumos/CENSO")
 
-## Now we import the dataset that it is in a CSV format
-listTabs <- c('deficit_cualitativo_departamento', 'deficit_cualitativo_distrital', 'deficit_cuantitativo_departamento',
-              'deficit_cuantitativo_distrital', 'deficit_habitacional_departamento', 'deficit_habitacional_distrital')
-
-for (file in listTabs){
-  
-  # create file name using paste0 function
-  file_name <- paste0(file, ".csv")
-  
-  alternative <- read.csv(file_name, sep = ";") %>% 
-    mutate(ubigeo = str_pad(ubigeo, width = 6, side = "left", pad = "0"))
-  
-  assign(paste0(file), alternative)
-}
+## Now we import the dataset that is in an excel format
+file_name <- "bd_censo_indicadores.xlsx"
+data <- read_excel(file_name)
 
 listDpto <-  deficit_cualitativo_departamento %>%
+  select(ubigeo)  %>%  
+  distinct()  %>%  
+  arrange(ubigeo) %>% 
+  drop_na()
+
+listProv <-  deficit_cualitativo_provincial %>%
   select(ubigeo)  %>%  
   distinct()  %>%  
   arrange(ubigeo) %>% 
