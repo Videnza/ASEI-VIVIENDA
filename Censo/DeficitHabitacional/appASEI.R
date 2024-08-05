@@ -10,6 +10,7 @@ library(sf)
 library(scales)
 library(plotly)
 library(classInt)
+library(readxl)
 
 # 1. Importing the data ----
 ## First we set the working directory
@@ -19,26 +20,50 @@ setwd("C:/Users/User/OneDrive - VIDENZA/1. Proyectos Videnza/1. Proyectos actual
 file_name <- "bd_censo_indicadores.xlsx"
 data <- read_excel(file_name)
 
-listDpto <-  deficit_cualitativo_departamento %>%
-  select(ubigeo)  %>%  
-  distinct()  %>%  
-  arrange(ubigeo) %>% 
-  drop_na()
+data <- data %>%
+  mutate(ubigeo = as.character(ubigeo))
 
-listProv <-  deficit_cualitativo_provincial %>%
-  select(ubigeo)  %>%  
-  distinct()  %>%  
-  arrange(ubigeo) %>% 
-  drop_na()
+## Separate database for departamentos, provincias and distritos
+departamentos <- data %>%
+  filter(substr(ubigeo, 3, 6) == "0000")
 
-listDist <-  deficit_cualitativo_distrital %>%
-  select(ubigeo)  %>%  
-  distinct()  %>%  
-  arrange(ubigeo) %>% 
-  drop_na()
+provincias <- data %>%
+  filter(substr(ubigeo, 5, 6) == "00" & substr(ubigeo, 3, 4) != "00")
 
-listIndicadores <- c("Déficit Cualitativo", "Déficit Cuantitativo", "Déficit Habitacional")
+distritos <- data %>%
+  filter(substr(ubigeo, 5, 6) != "00" & substr(ubigeo, 3, 4) != "00")
 
+## List of the names of departamentos, provincias and distritos
+listDpto <- departamentos %>%
+  select(departamento)  %>%  
+  arrange(departamento) %>% 
+  drop_na() %>% 
+  pull(departamento)
+
+listDpto <- c("TODOS", listDpto)
+
+listProv <- provincias %>%
+  select(provincia)  %>%  
+  arrange(provincia) %>% 
+  drop_na() %>% 
+  pull(provincia)
+
+listProv <- c("TODOS", listProv)
+
+listDist <- distritos %>%
+  select(distrito)  %>%  
+  arrange(distrito) %>% 
+  drop_na() %>% 
+  pull(distrito)
+
+listDist <- c("TODOS", listDist)
+
+## List of the variables 
+Indicadoresiniciales <- names(data)
+Indicadoresexcluidos <- c("ubigeo", "ccdd", "ccpp", "ccdi", "departamento", "provincia", "distrito")
+
+listIndicadores <- setdiff(Indicadoresiniciales, Indicadoresexcluidos)
+print(listIndicadores)
 
 #1.  Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -57,12 +82,6 @@ ui <- fluidPage(
                       sidebarLayout(
                         sidebarPanel(
                           titlePanel("Seleccione el nivel de análisis"),
-                          selectInput(inputId = "Nivel",
-                                      label = "Elija el nivel de análisis",
-                                      choices = c("Departamental", "Provincial", "Distrital"),
-                                      selected = "Departamental",
-                                      width = "220px"
-                          ),
                           selectInput(inputId = "Dpto",
                                       label = "Elija el departamento",
                                       choices = listDpto,
@@ -71,15 +90,15 @@ ui <- fluidPage(
                           ),
                           selectInput(inputId = "Prov",
                                       label = "Elija la provincia",
-                                      choices = c("Departamental", "Provincial", "Distrital"),
+                                      choices = listProv,
                                       selected = "TODOS",
                                       width = "220px"
-                          ),
-                          selectInput(inputId = "Dist",
-                                      label = "Elija el distrito",
-                                      choices = listDist,
-                                      selected = "TODOS",
-                                      width = "220px"
+#                          ),
+#                          selectInput(inputId = "Dist",
+#                                      label = "Elija el distrito",
+#                                      choices = listDist,
+#                                      selected = "TODOS",
+#                                      width = "220px"
                           ),
                           selectInput(inputId = "Indicador",
                                       label = "Seleccione el indicador",
