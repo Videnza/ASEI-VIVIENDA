@@ -82,6 +82,12 @@ ui <- fluidPage(
                       sidebarLayout(
                         sidebarPanel(
                           titlePanel("Seleccione el nivel de análisis"),
+                          selectInput(inputId = "Nivel",
+                                      label = "Elija el nivel de análisis",
+                                      choices = c("Departamental", "Provincial", "Distrital"),
+                                      selected = "Departamental",
+                                      width = "220px"
+                          ),
                           selectInput(inputId = "Dpto",
                                       label = "Elija el departamento",
                                       choices = listDpto,
@@ -93,17 +99,17 @@ ui <- fluidPage(
                                       choices = listProv,
                                       selected = "TODOS",
                                       width = "220px"
-#                          ),
-#                          selectInput(inputId = "Dist",
-#                                      label = "Elija el distrito",
-#                                      choices = listDist,
-#                                      selected = "TODOS",
-#                                      width = "220px"
+                          ),
+                          selectInput(inputId = "Dist",
+                                      label = "Elija el distrito",
+                                      choices = listDist,
+                                      selected = "TODOS",
+                                      width = "220px"
                           ),
                           selectInput(inputId = "Indicador",
                                       label = "Seleccione el indicador",
                                       choices = listIndicadores,
-                                      selected = "Déficit Habitacional",
+                                      selected = "deficit_total_porcentaje",
                                       width = "220px"
                           )),
                         mainPanel(
@@ -130,13 +136,13 @@ server <- function(input, output) {
         map_peru <- map_DEP  %>%  #Cargamos la base de datos sobre los departamentos del Peru
           rename(ubigeo = COD_DEPARTAMENTO ) #renombramos la variable del DF para el merge por UBIGEO
         
-        if (input$Indicador == "Déficit Habitacional"){
+        if (input$Indicador == "deficit_total_porcentaje"){
           
-          map_shiny <- merge(x = map_peru, y = deficit_habitacional_departamento, by = "ubigeo", all.x = TRUE)  %>% 
-            mutate(deficit_habitacional = as.numeric(deficit_habitacional))
+          map_shiny <- merge(x = map_peru, y = data$deficit_total_porcentaje, by = "ubigeo", all.x = TRUE)  %>% 
+            mutate(data$deficit_total_porcentaje = as.numeric(data$deficit_total_porcentaje))
             
-          breaks <- classIntervals(map_shiny$deficit_habitacional, n = 3, style = "jenks")
-          map_shiny$jenks_breaks <- cut(map_shiny$deficit_habitacional, breaks$brks, include.lowest = TRUE)
+          breaks <- classIntervals(map_shiny$deficit_total_porcentaje, n = 3, style = "jenks")
+          map_shiny$jenks_breaks <- cut(map_shiny$deficit_total_porcentaje, breaks$brks, include.lowest = TRUE)
           
           
           mapa <- map_shiny %>% 
@@ -149,10 +155,10 @@ server <- function(input, output) {
             scale_fill_manual(values = custom_palette, name = "Porcentaje de hogares (%)")
           ggplotly(mapa)
           
-        } else if (input$Indicador == "Déficit Cualitativo"){
+        } else if (input$Indicador == "deficit_cualitativo_porcentaje"){
           
-          map_shiny <- merge(x = map_peru, y = deficit_cualitativo_departamento, by = "ubigeo", all.x = TRUE)%>% 
-            mutate(deficit_cuali = as.numeric(deficit_cuali_departamento))
+          map_shiny <- merge(x = map_peru, y = deficit_cualitativo_porcentaje, by = "ubigeo", all.x = TRUE)%>% 
+            mutate(deficit_cuali_porcentaje = as.numeric(deficit_cuali_porcentaje))
           
           breaks <- classIntervals(map_shiny$deficit_cuali, n = 3, style = "jenks")
           map_shiny$jenks_breaks <- cut(map_shiny$deficit_cuali, breaks$brks, include.lowest = TRUE)
