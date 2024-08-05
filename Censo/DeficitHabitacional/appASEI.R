@@ -82,12 +82,6 @@ ui <- fluidPage(
                       sidebarLayout(
                         sidebarPanel(
                           titlePanel("Seleccione el nivel de análisis"),
-                          selectInput(inputId = "Nivel",
-                                      label = "Elija el nivel de análisis",
-                                      choices = c("Departamental", "Provincial", "Distrital"),
-                                      selected = "Departamental",
-                                      width = "220px"
-                          ),
                           selectInput(inputId = "Dpto",
                                       label = "Elija el departamento",
                                       choices = listDpto,
@@ -132,144 +126,42 @@ server <- function(input, output) {
       custom_palette <- c("#2dc937", "#e7b416", "#cc3232")
       
      
-      if (input$Nivel == "Departamental"){
+      if (input$Dpto != "TODOS" & input$Prov != "TODOS" & input$Dist != "TODOS"){
+        print("Zoom a la provincia y ponemos el mapa provincia con divisiones distritales")
+        #Poner el distrito seleccionado con un color distinto
+        
+      } else if (input$Dpto != "TODOS" & input$Prov == "TODOS"){
+          print("Zoom al departamento y ponemos el mapa del dpto con divisiones proviciales y distritales")
+      } else if (input$Dpto != "TODOS" & input$Prov != "TODOS" & input$Dist == "TODOS"){
+        print("Zoom a la provincia y ponemos el mapa provincia con divisiones distritales")
+      } else {
+        print("Mapa del Perú por regiones ")
+        
         map_peru <- map_DEP  %>%  #Cargamos la base de datos sobre los departamentos del Peru
           rename(ubigeo = COD_DEPARTAMENTO ) #renombramos la variable del DF para el merge por UBIGEO
+       
+        alterna <- data  %>%
+          select(ubigeo, input$Indicador) 
         
-        if (input$Indicador == "deficit_total_porcentaje"){
-          
-          map_shiny <- merge(x = map_peru, y = data$deficit_total_porcentaje, by = "ubigeo", all.x = TRUE)  %>% 
-            mutate(data$deficit_total_porcentaje = as.numeric(data$deficit_total_porcentaje))
-            
-          breaks <- classIntervals(map_shiny$deficit_total_porcentaje, n = 3, style = "jenks")
-          map_shiny$jenks_breaks <- cut(map_shiny$deficit_total_porcentaje, breaks$brks, include.lowest = TRUE)
-          
-          
-          mapa <- map_shiny %>% 
-            ggplot() +
-            aes(geometry = geometry) +
-            geom_sf(aes(fill = jenks_breaks), linetype = 1,
-                    lwd = 0.25) +
-            theme_minimal()+
-            theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank()) +
-            scale_fill_manual(values = custom_palette, name = "Porcentaje de hogares (%)")
-          ggplotly(mapa)
-          
-        } else if (input$Indicador == "deficit_cualitativo_porcentaje"){
-          
-          map_shiny <- merge(x = map_peru, y = deficit_cualitativo_porcentaje, by = "ubigeo", all.x = TRUE)%>% 
-            mutate(deficit_cuali_porcentaje = as.numeric(deficit_cuali_porcentaje))
-          
-          breaks <- classIntervals(map_shiny$deficit_cuali, n = 3, style = "jenks")
-          map_shiny$jenks_breaks <- cut(map_shiny$deficit_cuali, breaks$brks, include.lowest = TRUE)
-          
-          
-          mapa <- map_shiny %>% 
-            ggplot() +
-            aes(geometry = geometry) +
-            geom_sf(aes(fill = jenks_breaks), linetype = 1,
-                    lwd = 0.25) +
-            theme_minimal()+
-            theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank()) +
-            scale_fill_manual(values = custom_palette, name = "Porcentaje de hogares (%)")
-          ggplotly(mapa)
-          
-          
-        } else {
-          
-          map_shiny <- merge(x = map_peru, y = deficit_cuantitativo_departamento, by = "ubigeo", all.x = TRUE)%>% 
-            mutate(deficit_cuanti = as.numeric(deficit_cuanti_departamento))
-          
-          breaks <- classIntervals(map_shiny$deficit_cuanti, n = 3, style = "jenks")
-          map_shiny$jenks_breaks <- cut(map_shiny$deficit_cuanti, breaks$brks, include.lowest = TRUE)
-          
-          
-          mapa <- map_shiny %>% 
-            ggplot() +
-            aes(geometry = geometry) +
-            geom_sf(aes(fill = jenks_breaks), linetype = 1,
-                    lwd = 0.25) +
-            theme_minimal()+
-            theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank()) +
-            scale_fill_manual(values = custom_palette, name = "Porcentaje de hogares (%)")
-          ggplotly(mapa)
-          
-        }
+        colnames(alterna) <- c("ubigeo", "indicador")
         
-      
+        map_shiny <- merge(x = map_peru, y = alterna, by = "ubigeo", all.x = TRUE)  %>% 
+          mutate(indicador = as.numeric(indicador)) 
         
-      } else if  (input$Nivel == "Provincial"){
+        breaks <- classIntervals(map_shiny$indicador, n = 3, style = "jenks")
+        map_shiny$jenks_breaks <- cut(map_shiny$indicador, breaks$brks, include.lowest = TRUE)
         
-      } else {
-        map_peru <- map_DIST  %>%  #Cargamos la base de datos sobre los departamentos del Peru
-          rename(ubigeo = COD_DISTRITO ) #renombramos la variable del DF para el merge por UBIGEO
+        mapa <- map_shiny %>% 
+          ggplot() +
+          aes(geometry = geometry) +
+          geom_sf(aes(fill = jenks_breaks), linetype = 1,
+                  lwd = 0.25) +
+          theme_minimal()+
+          theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank()) +
+          scale_fill_manual(values = custom_palette, name = "Porcentaje de hogares (%)")
         
-        if (input$Indicador == "Déficit Habitacional"){
-          
-          map_shiny <- merge(x = map_peru, y = deficit_habitacional_distrital, by = "ubigeo", all.x = TRUE)%>% 
-            mutate(deficit_habitacional = as.numeric(deficit_habitacional))
-          
-          breaks <- classIntervals(map_shiny$deficit_habitacional, n = 3, style = "jenks")
-          map_shiny$jenks_breaks <- cut(map_shiny$deficit_habitacional, breaks$brks, include.lowest = TRUE)
-          
-          mapa <- map_shiny %>% 
-            ggplot() +
-            aes(geometry = geometry) +
-            geom_sf(color = "black", aes(fill = jenks_breaks), linewidth = 0) +
-            theme_minimal() +
-            theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank()) +
-            scale_fill_manual(values = custom_palette, name = "Porcentaje de hogares (%)") +
-            geom_sf(data = provinces, fill = NA, color = "black", lwd = 0.5) +
-            geom_sf(data = departments, fill = NA, color = "black", lwd = 1)
-          
-          ggplotly(mapa)
-          
-          
-        } else if (input$Indicador == "Déficit Cualitativo"){
-          
-          map_shiny <- merge(x = map_peru, y = deficit_cualitativo_distrital, by = "ubigeo", all.x = TRUE) %>% 
-            mutate(deficit_cualitativo = as.numeric(deficit_cualitativo))
-          
-          breaks <- classIntervals(map_shiny$deficit_cualitativo, n = 3, style = "jenks")
-          map_shiny$jenks_breaks <- cut(map_shiny$deficit_cualitativo, breaks$brks, include.lowest = TRUE)
-          
-          mapa <- map_shiny %>% 
-            ggplot() +
-            aes(geometry = geometry) +
-            geom_sf(color = "black", aes(fill = jenks_breaks), linewidth = 0) +
-            theme_minimal() +
-            theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank()) +
-            scale_fill_manual(values = custom_palette, name = "Porcentaje de hogares (%)") +
-            geom_sf(data = provinces, fill = NA, color = "black", lwd = 0.5) +
-            geom_sf(data = departments, fill = NA, color = "black", lwd = 1)
-          
-          ggplotly(mapa)
-          
-        } else {
-          
-          map_shiny <- merge(x = map_peru, y = deficit_cuantitativo_distrital, by = "ubigeo", all.x = TRUE) %>% 
-            mutate(deficit_cuantitativo = as.numeric(deficit_cuantitativo))
 
-          breaks <- classIntervals(map_shiny$deficit_cuantitativo, n = 3, style = "jenks")
-          map_shiny$jenks_breaks <- cut(map_shiny$deficit_cuantitativo, breaks$brks, include.lowest = TRUE)
-          
-          mapa <- map_shiny %>% 
-            ggplot() +
-            aes(geometry = geometry) +
-            geom_sf(color = "black", aes(fill = jenks_breaks), linewidth = 0) +
-            theme_minimal() +
-            theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank()) +
-            scale_fill_manual(values = custom_palette, name = "Porcentaje de hogares (%)") +
-            geom_sf(data = provinces, fill = NA, color = "black", lwd = 0.5) +
-            geom_sf(data = departments, fill = NA, color = "black", lwd = 1)
-          
-          ggplotly(mapa)
-          
-        }
       }
-      
-
-      
     })
 }
 
