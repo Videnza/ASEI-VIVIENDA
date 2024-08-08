@@ -178,9 +178,8 @@ server <- function(input, output, session) {
   ## Elaborate the map for the different indicators
     
   output$map1 <- renderPlotly({
-      
-      custom_palette <- c("#2dc937", "#e7b416", "#cc3232")
-      
+    
+    custom_palette <- c("#96d250", "#f2b138", "#c8463c")
      
       if (input$Dpto != "TODOS" & input$Prov != "TODOS" & input$Dist != "TODOS"){
         
@@ -229,7 +228,7 @@ server <- function(input, output, session) {
           aes(geometry = geometry) +
           geom_sf(aes(fill = jenks_breaks, text=text), linetype = 1,
                   lwd = 0.25) +
-          geom_sf(data = map_shiny[map_shiny$is_selected, ], aes(text = text), fill = NA, color = "black", size = 1.5) +  # Añadir bordes de distritos
+          geom_sf(data = map_shiny[map_shiny$is_selected, ], aes(text = text), fill = NA, color = "black", size = 3) +  # Añadir bordes de distritos
           theme_minimal()+
           theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank()) +
           scale_fill_manual(values = custom_palette, name = input$Indicador)
@@ -268,7 +267,7 @@ server <- function(input, output, session) {
           aes(geometry = geometry) +
           geom_sf(aes(fill = jenks_breaks, text=text), linetype = 1,
                   lwd = 0.25) +
-          geom_sf(data = selected_departamento, aes(text = text), fill = NA, color = "black", size = 1.5) +  # Resaltar departamento seleccionado
+          geom_sf(data = selected_departamento, aes(text = text), fill = NA, color = "black", size = 3) +  # Resaltar departamento seleccionado
           theme_minimal()+
           theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank()) +
           scale_fill_manual(values = custom_palette, name = input$Indicador)
@@ -330,7 +329,7 @@ server <- function(input, output, session) {
           aes(geometry = geometry) +
           geom_sf(aes(fill = jenks_breaks, text = text), linetype = 1,
                   lwd = 0.25) +
-          geom_sf(data = map_shiny[map_shiny$is_selected, ], aes(text = text), fill = NA, color = "black", size = 1.5) + # Resaltar provincia seleccionada
+          geom_sf(data = map_shiny[map_shiny$is_selected, ], aes(text = text), fill = NA, color = "black", size = 3) + # Resaltar provincia seleccionada
           theme_minimal() +
           theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank()) +
           scale_fill_manual(values = custom_palette, name = input$Indicador)
