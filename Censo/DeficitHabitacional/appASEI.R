@@ -214,8 +214,16 @@ server <- function(input, output, session) {
         
         # Identificar el distrito seleccionado
         
+        #selected_district <- map_shiny %>% 
+        #  filter(ubigeo == distritos$ubigeo[distritos$distrito == input$Dist])
+        
+        selected_ubigeo <- distritos$ubigeo[distritos$distrito == input$Dist & 
+                                              distritos$provincia == input$Prov & 
+                                              distritos$departamento == input$Dep]
+        
+        # Identificar el distrito seleccionado en el mapa
         selected_district <- map_shiny %>% 
-          filter(ubigeo == distritos$ubigeo[distritos$distrito == input$Dist])
+          filter(ubigeo == selected_ubigeo)
                
         mapa <- map_shiny %>% 
           ggplot() +
