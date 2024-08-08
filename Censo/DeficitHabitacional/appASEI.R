@@ -214,23 +214,22 @@ server <- function(input, output, session) {
         
         # Identificar el distrito seleccionado
         
-        #selected_district <- map_shiny %>% 
-        #  filter(ubigeo == distritos$ubigeo[distritos$distrito == input$Dist])
+        selected_district <- distritos %>%
+          filter(distrito == input$Dist, 
+                 provincia == input$Prov,
+                 departamento == input$Dpto) %>%
+          pull(ubigeo)
         
-        selected_ubigeo <- distritos$ubigeo[distritos$distrito == input$Dist & 
-                                              distritos$provincia == input$Prov & 
-                                              distritos$departamento == input$Dep]
-        
-        # Identificar el distrito seleccionado en el mapa
-        selected_district <- map_shiny %>% 
-          filter(ubigeo == selected_ubigeo)
+        # Filter the map_shiny data frame to highlight the selected district
+        map_shiny <- map_shiny %>%
+          mutate(is_selected = ubigeo == selected_district)
                
         mapa <- map_shiny %>% 
           ggplot() +
           aes(geometry = geometry) +
           geom_sf(aes(fill = jenks_breaks, text=text), linetype = 1,
                   lwd = 0.25) +
-          geom_sf(data = selected_district, aes(text = text), fill = NA, color = "black", size = 1.5) +  # Añadir bordes de distritos
+          geom_sf(data = map_shiny[map_shiny$is_selected, ], aes(text = text), fill = NA, color = "black", size = 1.5) +  # Añadir bordes de distritos
           theme_minimal()+
           theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank()) +
           scale_fill_manual(values = custom_palette, name = input$Indicador)
@@ -259,7 +258,7 @@ server <- function(input, output, session) {
           mutate(text = paste(departamentos$departamento[match(ubigeo, departamentos$ubigeo)],"<br>",
                               input$Indicador, ":", round(indicador, 2)))
         
-        # Identificar el distrito seleccionado
+        # Identificar el departamento seleccionado
         
         selected_departamento <- map_shiny %>% 
           filter(ubigeo == departamentos$ubigeo[departamentos$departamento == input$Dpto])
@@ -317,17 +316,21 @@ server <- function(input, output, session) {
           mutate(text = paste(provincias$provincia[match(ubigeo, provincias$ubigeo)],"<br>",
                               input$Indicador, ":", round(indicador, 2)))
         
-        # Identificar la provincia seleccionado
+        selected_provincia <- provincias %>%
+          filter(provincia == input$Prov,
+                 departamento == input$Dpto) %>%
+          pull(ubigeo)
         
-        selected_provincia <- map_shiny %>% 
-          filter(ubigeo == provincias$ubigeo[provincias$provincia == input$Prov])
+        # Filter the map_shiny data frame to highlight the selected district
+        map_shiny <- map_shiny %>%
+          mutate(is_selected = ubigeo == selected_provincia)
         
         mapa <- map_shiny %>% 
           ggplot() +
           aes(geometry = geometry) +
           geom_sf(aes(fill = jenks_breaks, text = text), linetype = 1,
                   lwd = 0.25) +
-          geom_sf(data = selected_provincia, aes(text = text), fill = NA, color = "black", size = 1.5) + # Resaltar provincia seleccionada
+          geom_sf(data = map_shiny[map_shiny$is_selected, ], aes(text = text), fill = NA, color = "black", size = 1.5) + # Resaltar provincia seleccionada
           theme_minimal() +
           theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank()) +
           scale_fill_manual(values = custom_palette, name = input$Indicador)
