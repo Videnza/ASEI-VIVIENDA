@@ -1,3 +1,11 @@
+---
+title: "ASEI"
+format: html
+editor: visual
+---
+
+
+```{r, echo=FALSE}
 # 0. Importing and calling libraries ----
 library(tidyverse)
 library(foreign)
@@ -902,3 +910,13 @@ server <- function(input, output, session) {
 
 # Run the application 
 shinyApp(ui = ui, server = server)
+```
+
+```{r}
+quarto::quarto_render("quatroASEI.qmd")
+```
+
+```{r}
+rsconnect::deployApp(appFiles = c("quatroASEI.qmd.qmd"))
+```
+
