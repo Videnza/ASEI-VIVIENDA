@@ -5,9 +5,9 @@ account: cesarnunezh
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 12443101
-bundleId: 8975377
+bundleId: 8975421
 url: https://cesarnunezh.shinyapps.io/DeficitHabitacional/
 version: 1
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: bd_censo_indicadoresNew.xlsx|bd_censo_indicadoresNUEVAMEDICION.xlsx|quatroASEI.qmd
+ignoredFiles: bd_censo_indicadores.csv|bd_censo_indicadoresNew.xlsx|bd_censo_indicadoresNUEVAMEDICION.csv|bd_censo_indicadoresNUEVAMEDICION.xlsx|quatroASEI.qmd

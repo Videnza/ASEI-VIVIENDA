@@ -20,29 +20,28 @@ library(shinydashboard)
 #setwd("C:/Users/User/OneDrive - MIGRACIÓN VIDENZA/1. Proyectos/1. Proyectos actuales/25. ASEI - Propuestas Vivienda/0. Insumos/CENSO")
 
 ## Now we import the dataset that is in an excel format
-file_name <- "https://github.com/cesarnunezh/ASEI-VIVIENDA/raw/main/Censo/DeficitHabitacional/bd_censo_indicadores.xlsx"
-file_name2 <- "https://github.com/cesarnunezh/ASEI-VIVIENDA/raw/main/Censo/DeficitHabitacional/bd_censo_indicadoresNUEVAMEDICION.xlsx"
-
-# Download the file
-temp_file <- tempfile(fileext = ".xlsx")
-GET(file_name, write_disk(temp_file))
+file_name <- "https://raw.githubusercontent.com/cesarnunezh/ASEI-VIVIENDA/main/Censo/DeficitHabitacional/bd_censo_indicadores.csv"
+file_name2 <- "https://raw.githubusercontent.com/cesarnunezh/ASEI-VIVIENDA/main/Censo/DeficitHabitacional/bd_censo_indicadoresNUEVAMEDICION.csv"
 
 # Read the Excel file
-data <- read_excel(temp_file)
-
-# Download the file
-temp_file <- tempfile(fileext = ".xlsx")
-GET(file_name2, write_disk(temp_file))
-
-# Read the Excel file
-dataNew <- read_excel(temp_file)
+data <- read.csv(file_name)
+dataNew <- read.csv(file_name2)
 
 data <- data %>%
-  mutate(ubigeo = as.character(ubigeo))
+  mutate(ccdd = sprintf("%02d", ccdd),
+         ccpp = sprintf("%02d", ccpp),
+         ccdi = sprintf("%02d", ccdi),
+         ubigeo = sprintf("%06d", ubigeo))
+
 
 dataNew <- dataNew %>%
   mutate(ubigeo = as.character(ubigeo)) %>% 
-  left_join(data %>% select(ubigeo, departamento, provincia, distrito))
+  left_join(data %>% select(ubigeo, departamento, provincia, distrito)) %>%
+  mutate(ubigeo = as.numeric(ubigeo)) %>% 
+  mutate(ccdd = sprintf("%02d", ccdd),
+         ccpp = sprintf("%02d", ccpp),
+         ccdi = sprintf("%02d", ccdi),
+         ubigeo = sprintf("%06d", ubigeo))
 
 ## Separate database for departamentos, provincias and distritos
 departamentos <- data %>%
