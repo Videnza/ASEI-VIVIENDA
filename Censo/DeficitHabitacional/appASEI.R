@@ -17,13 +17,25 @@ library(shinydashboard)
 # 1. Importing the data ----
 ## First we set the working directory
 #setwd("C:/Users/User/OneDrive - VIDENZA/1. Proyectos Videnza/1. Proyectos actuales/25. ASEI - Propuestas Vivienda/0. Insumos/CENSO")
-setwd("C:/Users/User/OneDrive - MIGRACIÓN VIDENZA/1. Proyectos/1. Proyectos actuales/25. ASEI - Propuestas Vivienda/0. Insumos/CENSO")
+#setwd("C:/Users/User/OneDrive - MIGRACIÓN VIDENZA/1. Proyectos/1. Proyectos actuales/25. ASEI - Propuestas Vivienda/0. Insumos/CENSO")
 
 ## Now we import the dataset that is in an excel format
-file_name <- "bd_censo_indicadores.xlsx"
-file_name2 <- "bd_censo_indicadoresNUEVAMEDICION.xlsx"
-data <- read_excel(file_name)
-dataNew <- read_excel(file_name2)
+file_name <- "https://github.com/cesarnunezh/ASEI-VIVIENDA/raw/main/Censo/DeficitHabitacional/bd_censo_indicadores.xlsx"
+file_name2 <- "https://github.com/cesarnunezh/ASEI-VIVIENDA/raw/main/Censo/DeficitHabitacional/bd_censo_indicadoresNUEVAMEDICION.xlsx"
+
+# Download the file
+temp_file <- tempfile(fileext = ".xlsx")
+GET(file_name, write_disk(temp_file))
+
+# Read the Excel file
+data <- read_excel(temp_file)
+
+# Download the file
+temp_file <- tempfile(fileext = ".xlsx")
+GET(file_name2, write_disk(temp_file))
+
+# Read the Excel file
+dataNew <- read_excel(temp_file)
 
 data <- data %>%
   mutate(ubigeo = as.character(ubigeo))
