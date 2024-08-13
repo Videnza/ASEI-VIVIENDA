@@ -25,7 +25,13 @@ file_name2 <- "https://raw.githubusercontent.com/cesarnunezh/ASEI-VIVIENDA/main/
 
 # Read the Excel file
 data <- read.csv(file_name)
-dataNew <- read.csv(file_name2)
+dataNew <- read.csv(file_name2) %>% 
+  select(-Total)
+
+cols_to_keep <- names(data)[!grepl("rural|urbano", names(data), ignore.case = TRUE)]
+
+# Crear el subconjunto de datos
+data <- data[, cols_to_keep]
 
 data <- data %>%
   mutate(ccdd = sprintf("%02d", ccdd),
@@ -34,14 +40,39 @@ data <- data %>%
          ubigeo = sprintf("%06d", ubigeo))
 
 
-dataNew <- dataNew %>%
-  mutate(ubigeo = as.character(ubigeo)) %>% 
+dataNew <- dataNew %>% 
+  mutate(ubigeo = sprintf("%06d", ubigeo)) %>% 
   left_join(data %>% select(ubigeo, departamento, provincia, distrito)) %>%
-  mutate(ubigeo = as.numeric(ubigeo)) %>% 
   mutate(ccdd = sprintf("%02d", ccdd),
          ccpp = sprintf("%02d", ccpp),
-         ccdi = sprintf("%02d", ccdi),
-         ubigeo = sprintf("%06d", ubigeo))
+         ccdi = sprintf("%02d", ccdi))
+
+dataNames <- c("Porcentaje de hogares con déficit habitacional (%)", 	"Número de hogares con déficit habitacional (en miles)", 	
+               "Porcentaje de hogares con déficit cuantitativo de vivienda (%)", 	"Número de hogares con déficit cuantitativo de vivienda (en miles)", 	
+               "Porcentaje de hogares con déficit cualitativo de vivienda (%)", 	"Número de hogares con déficit cualitativo de vivienda (en miles)", 	
+               "Porcentaje de viviendas no adecuadas (%)", 	"Número de hogares con viviendas no adecuadas (en miles)", 	
+               "Porcentaje de hogares en viviendas con material irrecuperable (%)", 	"Número de hogares en viviendas con material irrecuperable (en miles)", 	
+               "Porcentaje de hogares en viviendas hacinadas (%)", 	"Número de hogares en viviendas hacinadas (en miles)", 	
+               "Porcentaje de hogares sin electrificación (%)", 	"Número de hogares sin electrificación (en miles)", 	
+               "Porcentaje de hogares sin servicio de desague (%)", 	"Número de hogares sin servicio de desague (en miles)", 	
+               "Porcentaje de hogares sin servicio de agua (%)", 	"Número de hogares sin servicio de agua (en miles)")
+
+dataNames <- c("ubigeo", "ccdd", "ccpp", "ccdi", "departamento", "provincia", "distrito", dataNames)
+
+dataNamesNew <- c("Número de hogares con déficit habitacional (en miles)", 	"Número de hogares con déficit cualitativo de vivienda (en miles)",
+                  "Número de hogares cuyas viviendas requieren de mejoras en sus paredes, techos o piso (en miles)", 	"Número de hogares cuyas viviendas cuentan con servicios básicos deficitarios (en miles)", 	
+                  "Número de hogares cuyas viviendas requieren ampliarse (en miles)", 	"Número de hogares con déficit cuantitativo de vivienda (en miles)", 	
+                  "Número de hogares cuyas viviendas son irrecuperables (en miles)", 	"Número de hogares secundarios con hacinamiento (en miles)", 	
+                  "Número de hogares que cuentan con hacinamiento no ampliable (en miles)", 	"Porcentaje de hogares con déficit habitacional (%)", 	
+                  "Porcentaje de hogares con déficit cualitativo de vivienda (%)", 	"Porcentaje de hogares cuyas viviendas requieren de mejoras en sus paredes, techos o piso (%)", 	
+                  "Porcentaje de hogares cuyas viviendas cuentan con servicios básicos deficitarios (%)", 	"Porcentaje de hogares cuyas viviendas requieren ampliarse (%)", 	
+                  "Porcentaje de hogares con déficit cuantitativo de vivienda (%)", 	"Porcentaje de hogares cuyas viviendas son irrecuperables (%)", 	
+                  "Porcentaje de hogares secundarios con hacinamiento (%)", 	"Porcentaje de hogares que cuentan con hacinamiento no ampliable (%)")
+
+dataNamesNew <- c("ccdd", "ccpp", "ccdi", "ubigeo", dataNamesNew, "departamento", "provincia", "distrito")
+
+names(data) <- dataNames
+names(dataNew) <- dataNamesNew
 
 ## Separate database for departamentos, provincias and distritos
 departamentos <- data %>%
