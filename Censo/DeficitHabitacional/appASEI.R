@@ -47,15 +47,14 @@ dataNew <- dataNew %>%
          ccpp = sprintf("%02d", ccpp),
          ccdi = sprintf("%02d", ccdi))
 
-dataNames <- c("Porcentaje de hogares con déficit habitacional (%)", 	"Número de hogares con déficit habitacional (en miles)", 	
-               "Porcentaje de hogares con déficit cuantitativo de vivienda (%)", 	"Número de hogares con déficit cuantitativo de vivienda (en miles)", 	
-               "Porcentaje de hogares con déficit cualitativo de vivienda (%)", 	"Número de hogares con déficit cualitativo de vivienda (en miles)", 	
-               "Porcentaje de viviendas no adecuadas (%)", 	"Número de hogares con viviendas no adecuadas (en miles)", 	
-               "Porcentaje de hogares en viviendas con material irrecuperable (%)", 	"Número de hogares en viviendas con material irrecuperable (en miles)", 	
-               "Porcentaje de hogares en viviendas hacinadas (%)", 	"Número de hogares en viviendas hacinadas (en miles)", 	
-               "Porcentaje de hogares sin electrificación (%)", 	"Número de hogares sin electrificación (en miles)", 	
-               "Porcentaje de hogares sin servicio de desague (%)", 	"Número de hogares sin servicio de desague (en miles)", 	
-               "Porcentaje de hogares sin servicio de agua (%)", 	"Número de hogares sin servicio de agua (en miles)")
+dataNames <- c("Número de hogares con déficit habitacional (en miles)",	"Número de hogares con déficit cuantitativo (en miles)",	
+               "Número de hogares con viviendas inadecuadas (en miles)",	"Número de hogares secundarios (en miles)",	
+               "Número de hogares con déficit cualitativo (en miles)",	"Número de hogares sin acceso al paquete de servicios básicos (en miles)",	
+               "Número de hogares con viviendas irrecuperables (en miles)",	"Número de hogares con hacinamiento (en miles)",	
+               "Porcentaje de hogares con déficit habitacional (%)",	"Porcentaje de hogares con déficit cuantitativo (%)",	
+               "Porcentaje de hogares con viviendas inadecuadas (%)",	"Porcentaje de hogares secundarios (%)",	
+               "Porcentaje de hogares con déficit cualitativo (%)",	"Porcentaje de hogares sin acceso al paquete de servicios básicos (%)",	
+               "Porcentaje de hogares con viviendas irrecuperables (%)",	"Porcentaje de hogares con hacinamiento (%)")
 
 dataNames <- c("ubigeo", "ccdd", "ccpp", "ccdi", "departamento", "provincia", "distrito", dataNames)
 
@@ -667,8 +666,8 @@ server <- function(input, output, session) {
       df <- distritos %>% 
         filter(departamento == input$Dpto & provincia == input$Prov & distrito == input$Dist)
       
-      valor <- sum(df$`Número de hogares con déficit cuantitativo de vivienda (en miles)`)
-      pct <- weighted.mean(df$`Porcentaje de hogares con déficit cuantitativo de vivienda (%)`, w = df$`Número de hogares con déficit cuantitativo de vivienda (en miles)`)
+      valor <- sum(df$`Número de hogares con déficit cuantitativo (en miles)`)
+      pct <- weighted.mean(df$`Porcentaje de hogares con déficit cuantitativo (%)`, w = df$`Número de hogares con déficit cuantitativo (en miles)`)
       
       formatted_value <- paste(format(round(valor, 1), big.mark = ",", decimal.mark = "."))
       formatted_pct <- paste0(sprintf("%.2f", pct), "%")
@@ -680,8 +679,8 @@ server <- function(input, output, session) {
       df <- departamentos %>% 
         filter(departamento == input$Dpto)
       
-      valor <- sum(df$`Número de hogares con déficit cuantitativo de vivienda (en miles)`)
-      pct <- weighted.mean(df$`Porcentaje de hogares con déficit cuantitativo de vivienda (%)`, w = df$`Número de hogares con déficit cuantitativo de vivienda (en miles)`)
+      valor <- sum(df$`Número de hogares con déficit cuantitativo (en miles)`)
+      pct <- weighted.mean(df$`Porcentaje de hogares con déficit cuantitativo (%)`, w = df$`Número de hogares con déficit cuantitativo (en miles)`)
       
       formatted_value <- paste(format(round(valor, 1), big.mark = ",", decimal.mark = "."))
       formatted_pct <- paste0(sprintf("%.2f", pct), "%")
@@ -693,8 +692,8 @@ server <- function(input, output, session) {
       df <- provincias %>% 
         filter(departamento == input$Dpto & provincia == input$Prov)
       
-      valor <- sum(df$`Número de hogares con déficit cuantitativo de vivienda (en miles)`)
-      pct <- weighted.mean(df$`Porcentaje de hogares con déficit cuantitativo de vivienda (%)`, w = df$`Número de hogares con déficit cuantitativo de vivienda (en miles)`)
+      valor <- sum(df$`Número de hogares con déficit cuantitativo (en miles)`)
+      pct <- weighted.mean(df$`Porcentaje de hogares con déficit cuantitativo (%)`, w = df$`Número de hogares con déficit cuantitativo (en miles)`)
       
       formatted_value <- paste(format(round(valor, 1), big.mark = ",", decimal.mark = "."))
       formatted_pct <- paste0(sprintf("%.2f", pct), "%")
@@ -704,8 +703,8 @@ server <- function(input, output, session) {
       
     } else {
       
-      valor <- sum(departamentos$`Número de hogares con déficit cuantitativo de vivienda (en miles)`)
-      pct <- weighted.mean(departamentos$`Porcentaje de hogares con déficit cuantitativo de vivienda (%)`, w = departamentos$`Número de hogares con déficit cuantitativo de vivienda (en miles)`)
+      valor <- sum(departamentos$`Número de hogares con déficit cuantitativo (en miles)`)
+      pct <- weighted.mean(departamentos$`Porcentaje de hogares con déficit cuantitativo (%)`, w = departamentos$`Número de hogares con déficit cuantitativo (en miles)`)
       
       formatted_value <- paste(format(round(valor, 1), big.mark = ",", decimal.mark = "."))
       formatted_pct <- paste0(sprintf("%.2f", pct), "%")
@@ -722,8 +721,8 @@ server <- function(input, output, session) {
       df <- distritos %>% 
         filter(departamento == input$Dpto & provincia == input$Prov & distrito == input$Dist)
       
-      valor <- sum(df$`Número de hogares con déficit cualitativo de vivienda (en miles)`)
-      pct <- weighted.mean(df$`Porcentaje de hogares con déficit cualitativo de vivienda (%)`, w = df$`Número de hogares con déficit cualitativo de vivienda (en miles)`)
+      valor <- sum(df$`Número de hogares con déficit cualitativo (en miles)`)
+      pct <- weighted.mean(df$`Porcentaje de hogares con déficit cualitativo (%)`, w = df$`Número de hogares con déficit cualitativo (en miles)`)
       
       formatted_value <- paste(format(round(valor, 1), big.mark = ",", decimal.mark = ".")) 
       formatted_pct <- paste0(sprintf("%.2f", pct), "%")
@@ -736,8 +735,8 @@ server <- function(input, output, session) {
       df <- departamentos %>% 
         filter(departamento == input$Dpto)
       
-      valor <- sum(df$`Número de hogares con déficit cualitativo de vivienda (en miles)`)
-      pct <- weighted.mean(df$`Porcentaje de hogares con déficit cualitativo de vivienda (%)`, w = df$`Número de hogares con déficit cualitativo de vivienda (en miles)`)
+      valor <- sum(df$`Número de hogares con déficit cualitativo (en miles)`)
+      pct <- weighted.mean(df$`Porcentaje de hogares con déficit cualitativo (%)`, w = df$`Número de hogares con déficit cualitativo (en miles)`)
       
       formatted_value <- paste(format(round(valor, 1), big.mark = ",", decimal.mark = "."))
       formatted_pct <- paste0(sprintf("%.2f", pct), "%")
@@ -749,8 +748,8 @@ server <- function(input, output, session) {
       df <- provincias %>% 
         filter(departamento == input$Dpto & provincia == input$Prov)
       
-      valor <- sum(df$`Número de hogares con déficit cualitativo de vivienda (en miles)`)
-      pct <- weighted.mean(df$`Porcentaje de hogares con déficit cualitativo de vivienda (%)`, w = df$`Número de hogares con déficit cualitativo de vivienda (en miles)`)
+      valor <- sum(df$`Número de hogares con déficit cualitativo (en miles)`)
+      pct <- weighted.mean(df$`Porcentaje de hogares con déficit cualitativo (%)`, w = df$`Número de hogares con déficit cualitativo (en miles)`)
       
       formatted_value <- paste(format(round(valor, 1), big.mark = ",", decimal.mark = "."))
       formatted_pct <- paste0(sprintf("%.2f", pct), "%")
@@ -760,8 +759,8 @@ server <- function(input, output, session) {
       
     } else {
       
-      valor <- sum(departamentos$`Número de hogares con déficit cualitativo de vivienda (en miles)`)
-      pct <- weighted.mean(departamentos$`Porcentaje de hogares con déficit cualitativo de vivienda (%)`, w = departamentos$`Número de hogares con déficit cualitativo de vivienda (en miles)`)
+      valor <- sum(departamentos$`Número de hogares con déficit cualitativo (en miles)`)
+      pct <- weighted.mean(departamentos$`Porcentaje de hogares con déficit cualitativo (%)`, w = departamentos$`Número de hogares con déficit cualitativo (en miles)`)
       
       formatted_value <- paste(format(round(valor, 1), big.mark = ",", decimal.mark = "."))
       formatted_pct <- paste0(sprintf("%.2f", pct), "%")
