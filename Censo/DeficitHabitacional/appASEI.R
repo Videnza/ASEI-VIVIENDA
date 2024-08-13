@@ -1,5 +1,6 @@
 # 0. Importing and calling libraries ----
 library(tidyverse)
+library(readxl)
 library(foreign)
 library(shiny)
 library(shinyWidgets)
@@ -10,7 +11,6 @@ library(sf)
 library(scales)
 library(plotly)
 library(classInt)
-library(readxl)
 library(bslib)
 library(shinydashboard)
 
