@@ -5,7 +5,7 @@ account: cesarnunezh
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 12443101
-bundleId: 8979957
+bundleId: 8987524
 url: https://cesarnunezh.shinyapps.io/DeficitHabitacional/
 version: 1
 asMultiple: FALSE
